@@ -1,46 +1,60 @@
 package org.yearup.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.math.BigDecimal;
-import java.util.HashMap;
-import java.util.Map;
 
 public class ShoppingCart
 {
-    private Map<Integer, ShoppingCartItem> items = new HashMap<>();
+    private Product product = null;
+    private int quantity = 1;
+    private BigDecimal discountPercent = BigDecimal.ZERO;
 
-    public Map<Integer, ShoppingCartItem> getItems()
+
+    public Product getProduct()
     {
-        return items;
+        return product;
     }
 
-    public void setItems(Map<Integer, ShoppingCartItem> items)
+    public void setProduct(Product product)
     {
-        this.items = items;
+        this.product = product;
     }
 
-    public boolean contains(int productId)
+    public int getQuantity()
     {
-        return items.containsKey(productId);
+        return quantity;
     }
 
-    public void add(ShoppingCartItem item)
+    public void setQuantity(int quantity)
     {
-        items.put(item.getProductId(), item);
+        this.quantity = quantity;
     }
 
-    public ShoppingCartItem get(int productId)
+    public BigDecimal getDiscountPercent()
     {
-        return items.get(productId);
+        return discountPercent;
     }
 
-    public BigDecimal getTotal()
+    public void setDiscountPercent(BigDecimal discountPercent)
     {
-        BigDecimal total = items.values()
-                                .stream()
-                                .map(i -> i.getLineTotal())
-                                .reduce( BigDecimal.ZERO, (lineTotal, subTotal) -> subTotal.add(lineTotal));
-
-        return total;
+        this.discountPercent = discountPercent;
     }
 
+    @JsonIgnore
+    public int getProductId()
+    {
+        return this.product.getProductId();
+    }
+
+    public BigDecimal getLineTotal()
+    {
+        BigDecimal basePrice = product.getPrice();
+        BigDecimal quantity = new BigDecimal(this.quantity);
+
+        BigDecimal subTotal = basePrice.multiply(quantity);
+        BigDecimal discountAmount = subTotal.multiply(discountPercent);
+
+        return subTotal.subtract(discountAmount);
+    }
 }
