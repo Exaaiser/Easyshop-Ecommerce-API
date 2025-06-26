@@ -48,7 +48,7 @@ public class ShoppingCartController {
                 throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Ürün bulunamadı.");
             }
 
-            // Yeni eklenecek öğeyi oluştur
+
             ShoppingCartItem newItem = new ShoppingCartItem();
             newItem.setProduct(product);
             newItem.setQuantity(1); // Varsayılan olarak 1 adet ekle

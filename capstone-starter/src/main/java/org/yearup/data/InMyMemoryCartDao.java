@@ -10,10 +10,10 @@ import java.util.List;
 import java.util.HashMap;
 import java.util.Map;
 
-@Repository // Spring'in bu sınıfı bir bean olarak bulmasını sağlar
+@Repository
 public class InMyMemoryCartDao implements ShoppingCartDao {
 
-    // Kullanıcı adlarına göre sepetleri saklayan Map
+
     private Map<String, ShoppingCart> carts = new HashMap<>();
 
     @Override
@@ -51,11 +51,9 @@ public class InMyMemoryCartDao implements ShoppingCartDao {
     //
     @Override
     public List<ShoppingCartItem> getCartItems(String username) {
-        // Bu metot ShoppingCartController tarafından doğrudan kullanılmasa da,
-        // ShoppingCartDao arayüzünde tanımlı olduğu için implement edilmelidir.
+
         ShoppingCart userCart = carts.get(username);
         return userCart != null ? new ArrayList<>(userCart.getItems().values()) : new ArrayList<>();
-        // Not: ShoppingCart.getItems() artık bir Map döndürüyor olabilir,
-        // bu yüzden .values() ile öğe Collection'ını alıp List'e dönüştürüyoruz.
+
     }
 }

@@ -10,6 +10,6 @@ public interface ShoppingCartDao {
     List<ShoppingCartItem> getCartItems(String username); // Bu metod da muhtemelen ShoppingCart döndürmeli ama mevcut haliyle bırakıyorum
     void clearCart(String username);
 
-    // YENİ METOT: Kullanıcının tam sepetini döndürür
+    // Kullanıcının tam sepetini döndürür
     ShoppingCart getShoppingCartByUsername(String username); // <-- Bu satırı ekleyin
 }
