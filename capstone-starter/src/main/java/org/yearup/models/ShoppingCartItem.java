@@ -4,57 +4,27 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.math.BigDecimal;
 
-public class ShoppingCartItem
-{
-    private Product product = null;
+public class ShoppingCartItem {
+    private Product product;
     private int quantity = 1;
     private BigDecimal discountPercent = BigDecimal.ZERO;
 
+    public Product getProduct() { return product; }
+    public void setProduct(Product product) { this.product = product; }
 
-    public Product getProduct()
-    {
-        return product;
-    }
+    public int getQuantity() { return quantity; }
+    public void setQuantity(int quantity) { this.quantity = quantity; }
 
-    public void setProduct(Product product)
-    {
-        this.product = product;
-    }
-
-    public int getQuantity()
-    {
-        return quantity;
-    }
-
-    public void setQuantity(int quantity)
-    {
-        this.quantity = quantity;
-    }
-
-    public BigDecimal getDiscountPercent()
-    {
-        return discountPercent;
-    }
-
-    public void setDiscountPercent(BigDecimal discountPercent)
-    {
-        this.discountPercent = discountPercent;
-    }
+    public BigDecimal getDiscountPercent() { return discountPercent; }
+    public void setDiscountPercent(BigDecimal discountPercent) { this.discountPercent = discountPercent; }
 
     @JsonIgnore
-    public int getProductId()
-    {
-        return this.product.getProductId();
-    }
+    public int getProductId() { return this.product.getProductId(); }
 
-    public BigDecimal getLineTotal()
-    {
+    public BigDecimal getLineTotal() {
         BigDecimal basePrice = product.getPrice();
-        BigDecimal quantity = new BigDecimal(this.quantity);
-
-        BigDecimal subTotal = basePrice.multiply(quantity);
-        BigDecimal discountAmount = subTotal.multiply(discountPercent);
-
-        return subTotal.subtract(discountAmount);
+        BigDecimal qty = BigDecimal.valueOf(quantity);
+        BigDecimal subTotal = basePrice.multiply(qty);
+        return subTotal.subtract(subTotal.multiply(discountPercent));
     }
 }

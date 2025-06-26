@@ -1,0 +1,7 @@
+Customer: admin
+Date: 2025-06-26T10:46:15.659221700
+Items:
+- Smartphone x1
+Subtotal: $499.99
+Tax: $29.9994
+Total: $529.9894
