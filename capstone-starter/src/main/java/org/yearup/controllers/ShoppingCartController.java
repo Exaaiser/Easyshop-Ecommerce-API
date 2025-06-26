@@ -6,44 +6,41 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import org.yearup.data.ProductDao;
 import org.yearup.data.ShoppingCartDao;
-import org.yearup.data.UserDao;
 import org.yearup.models.Product;
+import org.yearup.models.ShoppingCart;
 import org.yearup.models.ShoppingCartItem;
-import org.yearup.models.User;
 
 import java.security.Principal;
-import java.util.List;
 
 @RestController
 @RequestMapping("/cart")
-@CrossOrigin
-@PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
+@CrossOrigin // Cross-Origin isteklerine izin verir
+@PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')") // Sadece yetkili kullanıcılar erişebilir
 public class ShoppingCartController {
 
     private final ShoppingCartDao shoppingCartDao;
-    private final UserDao userDao;
     private final ProductDao productDao;
 
-    public ShoppingCartController(ShoppingCartDao shoppingCartDao, UserDao userDao, ProductDao productDao) {
+    public ShoppingCartController(ShoppingCartDao shoppingCartDao, ProductDao productDao) {
         this.shoppingCartDao = shoppingCartDao;
-        this.userDao = userDao;
         this.productDao = productDao;
     }
 
-    // 1. Sepetteki ürünleri getir
+    // 1. Sepeti getir (GET /cart)
     @GetMapping("")
-    public List<ShoppingCartItem> getCartItems(Principal principal) {
+    public ShoppingCart getShoppingCart(Principal principal) {
         try {
             String username = principal.getName();
-            return shoppingCartDao.getCartItems(username);
+            return shoppingCartDao.getShoppingCartByUsername(username);
         } catch (Exception e) {
+            e.printStackTrace(); // Hatanın konsola yazılmasını sağlar
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Sepet alınamadı.");
         }
     }
 
-    // 2. Sepete ürün ekle
+    // 2. Sepete ürün ekle (POST /cart/products/{productId})
     @PostMapping("/products/{productId}")
-    public ShoppingCartItem addToCart(@PathVariable int productId, Principal principal) {
+    public ShoppingCart addToCart(@PathVariable int productId, Principal principal) {
         try {
             String username = principal.getName();
             Product product = productDao.getById(productId);
@@ -51,35 +48,41 @@ public class ShoppingCartController {
                 throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Ürün bulunamadı.");
             }
 
-            ShoppingCartItem item = new ShoppingCartItem();
-            item.setProduct(product);
-            item.setQuantity(1);
+            // Yeni eklenecek öğeyi oluştur
+            ShoppingCartItem newItem = new ShoppingCartItem();
+            newItem.setProduct(product);
+            newItem.setQuantity(1); // Varsayılan olarak 1 adet ekle
 
-            shoppingCartDao.addToCart(username, item);
-            return item;
+            shoppingCartDao.addToCart(username, newItem);
+            return shoppingCartDao.getShoppingCartByUsername(username); // Güncellenmiş sepeti döndür
         } catch (Exception e) {
+            e.printStackTrace();
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Sepete eklenemedi.");
         }
     }
 
-    // 3. Sepetten ürün çıkar
+    // 3. Sepetten ürün çıkar (DELETE /cart/products/{productId})
     @DeleteMapping("/products/{productId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT) // Başarılı olursa 204 No Content döndürür
     public void removeFromCart(@PathVariable int productId, Principal principal) {
         try {
             String username = principal.getName();
             shoppingCartDao.removeFromCart(username, productId);
         } catch (Exception e) {
+            e.printStackTrace();
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Ürün çıkarılamadı.");
         }
     }
 
-    // 4. Sepeti tamamen temizle
+    // 4. Sepeti tamamen temizle (DELETE /cart)
     @DeleteMapping("")
+    @ResponseStatus(HttpStatus.NO_CONTENT) // Başarılı olursa 204 No Content döndürür
     public void clearCart(Principal principal) {
         try {
             String username = principal.getName();
             shoppingCartDao.clearCart(username);
         } catch (Exception e) {
+            e.printStackTrace();
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Sepet temizlenemedi.");
         }
     }

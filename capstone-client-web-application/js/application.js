@@ -66,9 +66,13 @@ function saveProfile()
     profileService.updateProfile(profile);
 }
 
-function showCart()
-{
-    cartService.loadCartPage();
+function showCart() {
+    // cartService'in ShoppingCartService örneği olduğundan emin ol
+    if (cartService) {
+        cartService.loadCartPage(); // Sepet sayfasını yükle
+    } else {
+        console.error("Error: cartService is not initialized. Cannot show cart.");
+    }
 }
 
 function clearCart()
